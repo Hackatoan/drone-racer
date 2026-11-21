@@ -1,0 +1,35 @@
+{
+  "name": "drone-racer",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n server,client \"PORT=3043 AUTH_DEV=1 tsx watch server/index.ts\" \"vite\"",
+    "build": "vite build && esbuild server/index.ts --bundle --platform=node --format=esm --target=node20 --packages=external --outfile=dist/server.js",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx scripts/selftest.ts",
+    "nettest": "tsx scripts/nettest.ts"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "firebase": "^13.4.0",
+    "jose": "^6.2.18",
+    "pg": "^8.23.1",
+    "three": "^0.187.0",
+    "ws": "^8.23.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.17",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.6",
+    "@types/pg": "^8.23.1",
+    "@types/three": "^0.187.0",
+    "@types/ws": "^8.18.2",
+    "concurrently": "^10.0.7",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8"
+  }
+}

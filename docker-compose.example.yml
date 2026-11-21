@@ -1,0 +1,23 @@
+# Service block for the central games compose (Oracle games box, host networking).
+# Secrets go in the host's compose/env, never in this repo.
+services:
+  drone-racer:
+    image: ghcr.io/hackatoan/drone-racer:latest
+    container_name: drone-racer
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PORT=3043
+      - DATABASE_URL=postgresql://games:<password>@localhost:5432/games?sslmode=require&uselibpqcompat=true
+      - PUBLIC_URL=https://drone.hackatoa.com
+      - FIREBASE_PROJECT_ID=drone-racer-hk
+      - FIREBASE_WEB_CONFIG={"apiKey":"…","authDomain":"drone-racer-hk.firebaseapp.com","projectId":"drone-racer-hk","appId":"…"}
+      - ADMIN_UIDS=
+      # Premium (optional until keys exist)
+      - STRIPE_SECRET_KEY=
+      - STRIPE_WEBHOOK_SECRET=
+      # Tournament schedule (defaults shown)
+      - TOURNEY_EVERY_MIN=60
+      - TOURNEY_QUAL_MIN=10
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
