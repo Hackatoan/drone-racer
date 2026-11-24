@@ -1,7 +1,7 @@
 import express, { type Request, type Response, type NextFunction } from 'express';
 import { randomBytes } from 'node:crypto';
 import type { Db } from './db.ts';
-import { authOf, NAME_RE, authConfig, type Pilot, type Identity } from './auth.ts';
+import { authOf, NAME_RE, authConfig, isAdminUid, type Pilot, type Identity } from './auth.ts';
 import { resolveMap, officialList, rowMeta, parseRunFile, verifyRun, worldFor, makeRunFile } from './maps.ts';
 import { sanitizeMap } from '../shared/map.ts';
 import { mapHash, checkHeartbeats, inputsDigest, type RunFile, type QInput } from '../shared/replay.ts';
@@ -53,7 +53,8 @@ export function apiRouter(db: Db, hub: Hub) {
   r.post('/me/name', auth('ident'), async (req: AuthedReq, res) => {
     const name = String(req.body?.name ?? '').trim();
     if (!NAME_RE.test(name)) return bad(res, 400, '3-16 letters, numbers, _ or -');
-    if (/^(guest|autopilot|admin|hackatoa|system)/i.test(name) && !req.pilot?.admin) return bad(res, 400, 'that name is reserved');
+    // req.pilot is null until a name is claimed, so check the admin list by uid.
+    if (/^(guest|autopilot|admin|hackatoa|system)/i.test(name) && !isAdminUid(req.ident!.uid)) return bad(res, 400, 'that name is reserved');
     if (req.pilot) return bad(res, 400, 'you already have a pilot name');
     try {
       await db.query('insert into drone_pilots (uid, name, name_lc) values ($1, $2, $3)', [req.ident!.uid, name, name.toLowerCase()]);
